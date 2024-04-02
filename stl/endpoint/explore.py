@@ -52,7 +52,6 @@ class Explore(BaseEndpoint):
 
     def search(self, url: str):
         data = self._api_request(url)
-        #print(data['data']['dora']['exploreV3']['metadata']['paginationMetadata'])
         pagination = data['data']['dora']['exploreV3']['metadata']['paginationMetadata']
 
         return data, pagination

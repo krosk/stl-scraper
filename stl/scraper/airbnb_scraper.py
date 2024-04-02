@@ -14,24 +14,14 @@ from stl.exception.api import ForbiddenException
 from stl.persistence.elastic import Elastic
 from stl.persistence import PersistenceInterface
 
-def xstr(s):
-    return '' if s is None else str(s)
 
-def sign_currency(currency):
-    if currency=='EUR':
-        res='€'
-    elif currency=='USD':
-        res='$'
-    else:
-        res=currency
-    return res
 class AirbnbScraperInterface:
     def run(self, *args, **kwargs):
         raise NotImplementedError()
 
 
 class AirbnbSearchScraper(AirbnbScraperInterface):
-    def __init__(self, explore: Explore, pdp: Pdp, reviews: Reviews, persistence: PersistenceInterface,currency: str,logger: Logger):
+    def __init__(self, explore: Explore, pdp: Pdp, reviews: Reviews, persistence: PersistenceInterface, logger: Logger):
         self.__logger = logger
         self.__explore = explore
         self.__geography = {}
@@ -39,7 +29,6 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
         self.__pdp = pdp
         self.__persistence = persistence
         self.__reviews = reviews
-        self.__currency = currency
 
     def run(self, query: str, params: dict):
         listings = []
@@ -53,34 +42,36 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
         page = 1
         data_cache = {}
         while pagination.get('hasNextPage'):
-            listings_continue =[]
             self.__logger.info('Searching page {} for {}'.format(page, query))
-            listing_ids = self.__pdp.collect_listings_from_sections(data, self.__geography, data_cache)
+            listing_ids = self.__pdp.collect_listings_from_sections(
+                data, self.__geography, data_cache)
             for listing_id in listing_ids:  # request each property page
                 if listing_id in self.__ids_seen:
-                    self.__logger.info('Duplicate listing: {}'.format(listing_id))
+                    self.__logger.info(
+                        'Duplicate listing: {}'.format(listing_id))
                     continue  # skip duplicates
                 self.__ids_seen.add(listing_id)
                 n_listings += 1
                 reviews = self.__reviews.get_reviews(listing_id)
-                listing = self.__pdp.get_listing(listing_id, data_cache, self.__geography, reviews)
-                try:
-                    msg = '{:>4} {:<12} {:>12} {:<5}{:<9}{} {:<1} {} ({})'.format(
-                        '#' + str(n_listings),
-                        xstr(listing['city']),
-                        '{}{} {}'.format(sign_currency(self.__currency), xstr(listing['price_rate']), xstr(listing['price_rate_type'])),
-                        xstr(listing['bedrooms']) + 'br' if listing['bedrooms'] else '0br',
-                        '{:.2f}ba'.format(listing['bathrooms'] if listing['bathrooms'] else 0),
-                        xstr(listing['room_and_property_type']),
-                        '- {} -'.format(xstr(listing['neighborhood'])),
-                        xstr(listing['name']),
-                        xstr(listing['url'])
-                    )
-                    self.__logger.info(msg)
-                    listings.append(listing)
-                    listings_continue.append(listing)
-                except:
-                    self.__logger.error('ERROR_TO_HANDLE -- '+str(listing['id']))
+                listing = self.__pdp.get_listing(
+                    listing_id, data_cache, self.__geography, reviews)
+
+                msg = '{:>4} {:<12} {:>12} {:<5}{:<9}{} {:<1} {} ({})'.format(
+                    '#' + str(n_listings),
+                    listing['city'],
+                    '${} {}'.format(listing['price_rate'],
+                                    listing['price_rate_type']),
+                    str(listing['bedrooms']) +
+                    'br' if listing['bedrooms'] else '0br',
+                    '{:.2f}ba'.format(listing['bathrooms']),
+                    listing['room_and_property_type'],
+                    '- {} -'.format(listing['neighborhood']
+                                    ) if listing['neighborhood'] else '',
+                    listing['name'],
+                    listing['url']
+                )
+                self.__logger.info(msg)
+                listings.append(listing)
 
             self.__add_search_params(params, url)
             items_offset = pagination['itemsOffset']
@@ -88,9 +79,8 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
             url = self.__explore.get_url(query, params)
             data, pagination = self.__explore.search(url)
             page += 1
-            self.__persistence.save(query, listings_continue,continuous=True)
 
-        #self.__persistence.save(query, listings)
+        self.__persistence.save(query, listings)
         self.__logger.info('Got data for {} listings.'.format(n_listings))
 
     @staticmethod
@@ -148,37 +138,47 @@ class AirbnbCalendarScraper(AirbnbScraperInterface):
             for listing_id in self.__persistence.get_all_index_ids(since):
                 self.__update_calendar_and_pricing(listing_id)
         else:  # source is a listing id
-            booking_calendar, min_nights, max_nights = self.__calendar.get_calendar(source)
+            booking_calendar, min_nights, max_nights = self.__calendar.get_calendar(
+                source)
             ranges = Calendar.get_date_ranges('available', booking_calendar)
             return booking_calendar, self.__calendar.get_rate_data(source, ranges, min_nights, max_nights, True)
 
     def __update_calendar_and_pricing(self, listing_id):
         assert isinstance(self.__persistence, Elastic)
-        self.__logger.info(listing_id + ': getting pricing and calendar data...')
+        self.__logger.info(
+            listing_id + ': getting pricing and calendar data...')
         try:
-            calendar, min_nights, max_nights = self.__calendar.get_calendar(listing_id)
+            calendar, min_nights, max_nights = self.__calendar.get_calendar(
+                listing_id)
             assert isinstance(calendar, dict)
             for date_range in Calendar.get_date_ranges('booked', calendar):
                 if date_range['length'] > 62:
                     # assume 62+ night bookings not real and remove them from booking calendar
                     booking_dates = [(date_range['start'] + timedelta(days=i)).strftime('%Y-%m-%d')
                                      for i in range(date_range['length'])]
-                    calendar = {dt: calendar[dt] for dt in sorted(set(calendar) - set(booking_dates))}
+                    calendar = {dt: calendar[dt] for dt in sorted(
+                        set(calendar) - set(booking_dates))}
                 elif date_range['length'] > 50:
-                    self.__logger.warning('{}: {} day booking'.format(listing_id, date_range['length']))
+                    self.__logger.warning('{}: {} day booking'.format(
+                        listing_id, date_range['length']))
 
             self.__persistence.update_calendar(listing_id, calendar)
             ranges = Calendar.get_date_ranges('available', calendar)
-            pricing_doc = self.__calendar.get_rate_data(listing_id, ranges, min_nights, max_nights)
+            pricing_doc = self.__calendar.get_rate_data(
+                listing_id, ranges, min_nights, max_nights)
             if not pricing_doc:
-                self.__logger.warning('Could not get any pricing data for {}'.format(listing_id))
+                self.__logger.warning(
+                    'Could not get any pricing data for {}'.format(listing_id))
                 return
-            self.__persistence.update_pricing(listing_id, pricing_doc, min_nights, max_nights)
+            self.__persistence.update_pricing(
+                listing_id, pricing_doc, min_nights, max_nights)
         except ForbiddenException:
             if self.__exists_listing(listing_id):
-                raise RuntimeError('Could not get listing calendar for existing listing %s' % listing_id)
+                raise RuntimeError(
+                    'Could not get listing calendar for existing listing %s' % listing_id)
             else:
-                self.__logger.warning('GONE: deleting listing id {}'.format(listing_id))
+                self.__logger.warning(
+                    'GONE: deleting listing id {}'.format(listing_id))
                 self.__persistence.mark_deleted(listing_id)
 
     @staticmethod
@@ -192,4 +192,5 @@ class AirbnbCalendarScraper(AirbnbScraperInterface):
         elif response.status_code == 410:  # Gone
             return False
         else:
-            raise RuntimeError('Unhandled response code: {}\n{}'.format(response.status_code, response.text))
+            raise RuntimeError('Unhandled response code: {}\n{}'.format(
+                response.status_code, response.text))

@@ -62,8 +62,10 @@ Global Options:
         return logging.getLogger(__class__.__module__.lower())
 
     def execute(self):
-        project_path = os.path.dirname(os.path.realpath('{}/../../'.format(__file__)))
-        currency = self.__args.get('--currency') or os.getenv('SEARCH_CURRENCY', 'USD')
+        project_path = os.path.dirname(
+            os.path.realpath('{}/../../'.format(__file__)))
+        currency = self.__args.get(
+            '--currency') or os.getenv('SEARCH_CURRENCY', 'USD')
         if self.__args.get('search'):
             query = self.__args['<query>']
             persistence = self.__create_persistence(project_path, query)
@@ -73,31 +75,32 @@ Global Options:
 
         elif self.__args.get('calendar'):
             if self.__args.get('--all') and self.__args.get('--storage') == 'csv':
-                self.__logger.critical('"csv" storage backend not supported in combination with "--all" option.')
+                self.__logger.critical(
+                    '"csv" storage backend not supported in combination with "--all" option.')
                 exit(1)
             persistence = self.__create_persistence(project_path)
             scraper = self.__create_scraper('calendar', persistence, currency)
-            source = 'elasticsearch' if self.__args.get('--all') else self.__args['<listingId>']
+            source = 'elasticsearch' if self.__args.get(
+                '--all') else self.__args['<listingId>']
             scraper.run(source, self.__args.get('--updated'))
 
         elif self.__args.get('data'):
-            ca_cert = os.getenv('CA_CERT', None)
-            throttle = int(os.getenv('THROTTLE', 2))
-            pdp = Pdp(os.getenv('AIRBNB_API_KEY'), currency, os.getenv('PROXY', None), ca_cert, throttle, self.__logger)
+            pdp = Pdp(os.getenv('AIRBNB_API_KEY'), currency, self.__logger)
             print(json.dumps(pdp.get_raw_listing(self.__args.get('<listingId>'))))
 
         elif self.__args.get('pricing'):
             listing_id = self.__args.get('<listingId>')
             checkin = self.__args.get('--checkin')
             checkout = self.__args.get('--checkout')
-            ca_cert = os.getenv('CA_CERT', None)
-            throttle = int(os.getenv('THROTTLE', 2))
-            pricing = Pricing(os.getenv('AIRBNB_API_KEY'), currency, os.getenv('PROXY', None), ca_cert, throttle, self.__logger)
+            pricing = Pricing(os.getenv('AIRBNB_API_KEY'),
+                              currency, self.__logger)
             total = pricing.get_pricing(checkin, checkout, listing_id)
-            print('https://www.airbnb.com/rooms/{} - {} to {}: {}'.format(listing_id, checkin, checkout, total))
+            print('https://www.airbnb.com/rooms/{} - {} to {}: {}'.format(listing_id,
+                  checkin, checkout, total))
 
         else:
-            raise RuntimeError('ERROR: Unexpected command:\n{}'.format(*self.__args))
+            raise RuntimeError(
+                'ERROR: Unexpected command:\n{}'.format(*self.__args))
 
     def __create_scraper(
             self,
@@ -107,25 +110,23 @@ Global Options:
     ) -> AirbnbScraperInterface:
         """Create scraper of given type using given parameters."""
         api_key = os.getenv('AIRBNB_API_KEY')
-        proxy = os.getenv('PROXY', None)
-        ca_cert = os.getenv('CA_CERT', None)
 
-        throttle = int(os.getenv('THROTTLE', 2))
         if scraper_type == 'search':
-            explore = Explore(api_key, currency, proxy, ca_cert, throttle, self.__logger)
-            pdp = Pdp(api_key, currency, proxy, ca_cert, throttle, self.__logger)
-            reviews = Reviews(api_key, currency, proxy, ca_cert, throttle, self.__logger)
-            return AirbnbSearchScraper(explore, pdp, reviews, persistence,currency, self.__logger)
+            explore = Explore(api_key, currency, self.__logger)
+            pdp = Pdp(api_key, currency, self.__logger)
+            reviews = Reviews(api_key, currency, self.__logger)
+            return AirbnbSearchScraper(explore, pdp, reviews, persistence, self.__logger)
         elif scraper_type == 'calendar':
-            pricing = Pricing(api_key, currency, proxy, ca_cert, throttle, self.__logger)
-            calendar = Calendar(api_key, currency, proxy, ca_cert, throttle, self.__logger, pricing)
+            pricing = Pricing(api_key, currency, self.__logger)
+            calendar = Calendar(api_key, currency, self.__logger, pricing)
             return AirbnbCalendarScraper(calendar, persistence, self.__logger)
         else:
             raise RuntimeError('Unknown scraper type: %s' % scraper_type)
 
     def __create_persistence(self, project_path: str = None, query: str = None) -> PersistenceInterface:
         """Create persistence layer - either CSV or Elasticsearch."""
-        storage_type = self.__args.get('--storage') or os.getenv('STORAGE_TYPE')
+        storage_type = self.__args.get(
+            '--storage') or os.getenv('STORAGE_TYPE')
         if storage_type == 'elasticsearch':
             es_params = {
                 'hosts':      os.getenv('ELASTIC_HOSTS'),
@@ -135,11 +136,14 @@ Global Options:
                 es_params['ca_certs'] = os.getenv('ELASTIC_CA_CERT')
             else:
                 es_params['verify_certs'] = False
-            persistence = Elastic(Elasticsearch(**es_params), os.getenv('ELASTIC_INDEX'))
+            persistence = Elastic(Elasticsearch(
+                **es_params), os.getenv('ELASTIC_INDEX'))
             try:
-                persistence.create_index_if_not_exists(os.getenv('ELASTIC_INDEX'))
+                persistence.create_index_if_not_exists(
+                    os.getenv('ELASTIC_INDEX'))
             except ConnectionError as e:
-                self.__logger.critical(e.message + '\nCould not connect to elasticsearch.')
+                self.__logger.critical(
+                    e.message + '\nCould not connect to elasticsearch.')
                 exit(1)
         else:  # assume csv
             csv_path = os.path.join(project_path, '{}.csv'.format(query))
@@ -168,7 +172,8 @@ Global Options:
 
     def __get_list_arg(self, arg_name: str) -> list | None:
         """Get CLI comma-separated list argument, fall back to config."""
-        arg_val = self.__args.get('--{}'.format(arg_name)) or os.getenv('SEARCH_{}'.format(arg_name.upper()), '')
+        arg_val = self.__args.get(
+            '--{}'.format(arg_name)) or os.getenv('SEARCH_{}'.format(arg_name.upper()), '')
         if not arg_val:
             return None
 
