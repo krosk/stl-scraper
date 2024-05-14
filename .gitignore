@@ -8,3 +8,6 @@ __pycache__
 .env
 stl.ini
 /others
+Include
+Lib
+Scripts
