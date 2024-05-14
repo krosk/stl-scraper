@@ -52,7 +52,8 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
                     continue  # skip duplicates
                 self.__ids_seen.add(listing_id)
                 n_listings += 1
-                reviews = self.__reviews.get_reviews(listing_id)
+                #reviews = self.__reviews.get_reviews(listing_id)
+                reviews = [] # skip review as list, not of interest
                 listing = self.__pdp.get_listing(
                     listing_id, data_cache, self.__geography, reviews)
 
