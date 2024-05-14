@@ -1,5 +1,6 @@
 import json
 import requests
+import traceback
 
 from abc import ABC
 from logging import Logger
@@ -38,8 +39,21 @@ class BaseEndpoint(ABC):
         while attempts < max_attempts:
             sleep(randint(0, 2))  # do a little throttling
             attempts += 1
-            response = requests.request(
-                method, url, headers=headers, data=data)
+            try:
+                response = requests.request(method, url, headers=headers, data=data)
+                response.raise_for_status()  # Check for HTTP errors
+            except requests.exceptions.HTTPError as errh:
+                traceback.print_exc()
+                continue
+            except requests.exceptions.ConnectionError as errc:
+                traceback.print_exc()
+                continue
+            except requests.exceptions.Timeout as errt:
+                traceback.print_exc()
+                continue
+            except requests.exceptions.RequestException as err:
+                traceback.print_exc()
+                continue
 
             response_json = response.json()
 
