@@ -12,6 +12,7 @@ from stl.endpoint.explore import Explore
 from stl.endpoint.pdp import Pdp
 from stl.endpoint.reviews import Reviews
 from stl.persistence.csv import Csv
+from stl.persistence.json import Json
 from stl.persistence.elastic import Elastic
 from stl.persistence import PersistenceInterface
 from stl.scraper.airbnb_scraper import AirbnbSearchScraper, AirbnbCalendarScraper, AirbnbScraperInterface
@@ -44,7 +45,7 @@ recently updated. [default: 1d]
 Global Options:
     --currency=<currency>  "USD", "EUR", etc. (default: USD)
     --source=<source>      Only allows "airbnb" [default: airbnb]
-    --storage=<storage>    csv or elasticsearch (default: csv)
+    --storage=<storage>    csv or elasticsearch or json (default: csv)
     -v, --verbose          Verbose logging output
 """
 
@@ -146,6 +147,8 @@ Global Options:
                 self.__logger.critical(
                     e.message + '\nCould not connect to elasticsearch.')
                 exit(1)
+        elif storage_type == 'json':
+            persistence = Json(project_path)
         else:  # assume csv
             csv_path = os.path.join(project_path, '{}.csv'.format(query))
             persistence = Csv(csv_path)
