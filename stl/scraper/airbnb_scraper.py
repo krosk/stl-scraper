@@ -41,7 +41,7 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
         n_listings = 0
         page = 1
         data_cache = {}
-        while pagination.get('hasNextPage'):
+        while True:
             self.__logger.info('Searching page {} for {}'.format(page, query))
             listing_ids = self.__pdp.collect_listings_from_sections(
                 data, self.__geography, data_cache)
@@ -77,9 +77,12 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
             self.__add_search_params(params, url)
             items_offset = pagination['itemsOffset']
             params.update({'itemsOffset': items_offset})
-            url = self.__explore.get_url(query, params)
-            data, pagination = self.__explore.search(url)
-            page += 1
+            if pagination.get('hasNextPage'):
+                url = self.__explore.get_url(query, params)
+                data, pagination = self.__explore.search(url)
+                page += 1
+            else:
+                break
 
         self.__persistence.save(query, listings)
         self.__logger.info('Got data for {} listings.'.format(n_listings))
