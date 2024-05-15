@@ -21,7 +21,7 @@ class StlCommand:
     """Short-Term Listings (STL) Scraper
 
 Usage:
-    stl.py search <query> [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
+    stl.py search <query> [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
 [--roomTypes=<roomTypes>] [--storage=<storage>] [-v|--verbose]
     stl.py calendar (<listingId> | --all) [--updated=<updated>]
     stl.py pricing <listingId> --checkin=<checkin> --checkout=<checkout>
@@ -36,6 +36,7 @@ Options:
     --checkout=<checkout>  Check-out date, e.g. "2023-06-30"
     --priceMin=<priceMin>  Minimum nightly or monthly price
     --priceMax=<priceMax>  Maximum nightly or monthly price
+    --radius=<radius>      Radius for search
     --updated=<updated>    Only update listings not updated in given period. Prevents updating listings that have been \
 recently updated. [default: 1d]
     --all                  Update calendar for all listings (requires Elasticsearch backend)
@@ -167,6 +168,9 @@ Global Options:
 
         if self.__args.get('--priceMin'):
             params['priceMin'] = self.__args['--priceMin']
+        
+        if self.__args.get('--radius'):
+            params['radius'] = self.__args['--radius']
 
         return params
 
