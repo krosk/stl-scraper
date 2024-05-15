@@ -462,6 +462,8 @@ class Pdp(BaseEndpoint):
             elif address_city:
                 address_neighborhood = unknown_components.pop()
 
+        return city, neighborhood
+    
         reverse_geo_address = self.__geocoder.reverse(
             listing['lat'], listing['lng'])
 
@@ -472,7 +474,6 @@ class Pdp(BaseEndpoint):
         if self.__geocoder.is_city((city or localized_city), reverse_geo_address['country']):
             return city or localized_city, neighborhood
 
-        return city, neighborhood
 
     def __get_amenity_ids(self, amenities: list):
         """Extract amenity id from `id` string field."""

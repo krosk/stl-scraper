@@ -1,0 +1,22 @@
+/* styles/main.css */
+body {
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    height: 800px;
+    width: 100%;
+}
+
+.custom-marker {
+    background-color: darkblue;
+    display: flex;   /* Add this line */
+    align-items: center; /* And these two lines to center content vertically and horizontally */
+    justify-content: center;
+}
+
+.custom-marker div {
+    color: yellow;
+    font-size: 10px;
+    text-align: center; /* Add this line to center text horizontally */
+}
