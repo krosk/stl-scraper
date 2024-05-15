@@ -22,7 +22,7 @@ class StlCommand:
     """Short-Term Listings (STL) Scraper
 
 Usage:
-    stl.py search <query> [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
+    stl.py search <query> [--interval=<interval>] [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
 [--roomTypes=<roomTypes>] [--storage=<storage>] [-v|--verbose]
     stl.py calendar (<listingId> | --all) [--updated=<updated>]
     stl.py pricing <listingId> --checkin=<checkin> --checkout=<checkout>
