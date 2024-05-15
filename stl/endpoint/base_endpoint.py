@@ -46,7 +46,8 @@ class BaseEndpoint(ABC):
                 traceback.print_exc()
                 continue
             except requests.exceptions.ConnectionError as errc:
-                traceback.print_exc()
+                #traceback.print_exc()
+                self._logger.error('ConnectionError')
                 continue
             except requests.exceptions.Timeout as errt:
                 traceback.print_exc()

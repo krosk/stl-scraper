@@ -70,6 +70,7 @@ Global Options:
             '--currency') or os.getenv('SEARCH_CURRENCY', 'USD')
         if self.__args.get('search'):
             query = self.__args['<query>']
+            self.__logger.info(f'Processing search query: {query}')
             persistence = self.__create_persistence(project_path, query)
             scraper = self.__create_scraper('search', persistence, currency)
             params = self.__get_search_params()
