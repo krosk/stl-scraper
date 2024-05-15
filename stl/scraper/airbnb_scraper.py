@@ -44,7 +44,7 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
         while True:
             self.__logger.info('Searching page {} for {}'.format(page, query))
             listing_ids = self.__pdp.collect_listings_from_sections(
-                data, self.__geography, data_cache)
+                data, self.__geography, data_cache, params.get('checkin', None), params.get('checkout', None))
             for listing_id in listing_ids:  # request each property page
                 if listing_id in self.__ids_seen:
                     self.__logger.info(

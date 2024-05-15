@@ -3,7 +3,7 @@ import lxml.html
 import pycountry
 import re
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import Logger
 
 from stl.endpoint.base_endpoint import BaseEndpoint
@@ -97,7 +97,7 @@ class Pdp(BaseEndpoint):
         url = self.__get_url(listing_id)
         return self._api_request(url)
 
-    def collect_listings_from_sections(self, data: dict, geography: dict, data_cache: dict):
+    def collect_listings_from_sections(self, data: dict, geography: dict, data_cache: dict, checkin: str = None, checkout: str = None):
         """Get listings from "sections" (i.e. search results page sections)."""
         sections = data['data']['dora']['exploreV3']['sections']
         listing_ids = []
@@ -105,12 +105,12 @@ class Pdp(BaseEndpoint):
             for listing_item in section.get('items'):
                 listing_id = listing_item['listing']['id']
                 self.__collect_listing_data(
-                    listing_item, geography, data_cache)
+                    listing_item, geography, data_cache, checkin, checkout)
                 listing_ids.append(listing_id)
 
         return listing_ids
 
-    def __collect_listing_data(self, listing_item: dict, geography: dict, data_cache: dict):
+    def __collect_listing_data(self, listing_item: dict, geography: dict, data_cache: dict, checkin: str = None, checkout: str = None):
         """Collect listing data from search results, save in _data_cache. 
 
         The section data for each search result listing will later be combined with the PDP listing data in the 
@@ -147,12 +147,10 @@ class Pdp(BaseEndpoint):
         if pricing:
             # add pricing data
             data_cache[listing['id']] |= {
-                # 'monthly_price_factor': pricing.get('monthlyPriceFactor'),
-                # 'weekly_price_factor':  pricing.get('weeklyPriceFactor'),
                 'price_rate':           self.__get_price_rate(pricing),
+                'price_per_date':       self.__get_price_detail(pricing, checkin, checkout),
                 'price_currency':       self.__get_price_currency(pricing),
-                'price_rate_type':      self.__get_rate_type(pricing),
-                #'total_price':          self.__get_total_price(pricing)
+                'price_rate_type':      self.__get_rate_type(pricing)
             }
 
     def __get_url(self, listing_id: str):
@@ -377,6 +375,7 @@ class Pdp(BaseEndpoint):
             # 'photos': listing_data_cached['photos'],
             'place_id': geography['placeId'],
             'price_rate': listing_data_cached.get('price_rate'),
+            'price_per_date': listing_data_cached.get('price_per_date'),
             'price_currency': listing_data_cached.get('price_currency'),
             'price_rate_type': listing_data_cached.get('price_rate_type'),
             'province': geography.get('province'),
@@ -564,9 +563,51 @@ class Pdp(BaseEndpoint):
         return None
 
     @staticmethod
+    def extract_first_digit_group(string: str) -> int:
+        # Find all non-empty sequences of digits and return the first one as integer
+        match = re.search('\d+', string.replace(',', ''))
+        if match:
+            return int(match.group())
+        else:
+            return None
+
+    @staticmethod
+    def __get_dates(checkin: str, checkout: str) -> list[str]:
+        if checkin is None or checkout is None:
+            return []
+        
+        # Convert strings to date objects
+        start_date = datetime.strptime(checkin, '%Y-%m-%d')
+        end_date = datetime.strptime(checkout, '%Y-%m-%d')
+
+        # Iterate over each day between the start and end dates
+        dates = []
+        for date in (start_date + timedelta(days=i) for i in range((end_date - start_date).days)):
+            dates.append(date.strftime('%Y-%m-%d'))
+
+        return dates
+
+    @staticmethod
+    def __get_price_detail(pricing, checkin: str = None, checkout: str = None) -> dict | None:
+        """ excluding fees """
+        if pricing:
+            price_key = Pdp.__get_price_key(pricing)
+            desc = pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'][0]['description']
+            if 'nights' in desc: # "'€\xa01,200 x 2 nights'"
+                price = Pdp.extract_first_digit_group(desc)
+                if price:
+                    dates = Pdp.__get_dates(checkin, checkout)
+                    price_per_date = {date: price for date in dates}
+                    return price_per_date
+            else:
+                raise ValueError(desc)
+
+        return None
+
+    @staticmethod
     def __get_price_rate(pricing) -> int | None:
         """_summary_:
-        - Get price rate from pricing data.
+        - Get price rate from pricing data, excluding Airbnb service fee
 
         Args:
             pricing (dict): Pricing data.
@@ -580,7 +621,7 @@ class Pdp(BaseEndpoint):
             price_key = Pdp.__get_price_key(pricing)
             res = pricing['structuredStayDisplayPrice']['primaryLine'][price_key].replace(
                 '\xa0', ' ')
-            return int(''.join(filter(str.isdigit, res)))
+            return int(int(''.join(filter(str.isdigit, res))) / 1.142)
 
         return None
 
