@@ -60,7 +60,8 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
                 msg = '{:>4} {:<12} {:>12} {:<5}{:<9}{} {:<1} {} ({})'.format(
                     '#' + str(n_listings),
                     listing['city'],
-                    '${} {}'.format(listing['price_rate'],
+                    '{}{} {}'.format(listing['price_currency'],
+                                     listing['price_rate'],
                                     listing['price_rate_type']),
                     str(listing['bedrooms']) +
                     'br' if listing['bedrooms'] else '0br',

@@ -150,8 +150,9 @@ class Pdp(BaseEndpoint):
                 # 'monthly_price_factor': pricing.get('monthlyPriceFactor'),
                 # 'weekly_price_factor':  pricing.get('weeklyPriceFactor'),
                 'price_rate':           self.__get_price_rate(pricing),
+                'price_currency':       self.__get_price_currency(pricing),
                 'price_rate_type':      self.__get_rate_type(pricing),
-                'total_price':          self.__get_total_price(pricing)
+                #'total_price':          self.__get_total_price(pricing)
             }
 
     def __get_url(self, listing_id: str):
@@ -328,6 +329,9 @@ class Pdp(BaseEndpoint):
         # # reviews
         # reviews = self.__get_reviews(listing_id)
 
+        # structured price
+        
+
         # Structure data
         item = {
             'id': listing_id,
@@ -373,6 +377,7 @@ class Pdp(BaseEndpoint):
             # 'photos': listing_data_cached['photos'],
             'place_id': geography['placeId'],
             'price_rate': listing_data_cached.get('price_rate'),
+            'price_currency': listing_data_cached.get('price_currency'),
             'price_rate_type': listing_data_cached.get('price_rate_type'),
             'province': geography.get('province'),
             'rating_accuracy': logging_data['accuracyRating'],
@@ -391,7 +396,7 @@ class Pdp(BaseEndpoint):
             'satisfaction_guest': logging_data['guestSatisfactionOverall'],
             'star_rating': listing_data_cached['star_rating'],
             'state': geography['state'],
-            'total_price': listing_data_cached.get('total_price'),
+            #'total_price': listing_data_cached.get('total_price'),
             'url': f"https://www.airbnb.com/rooms/{listing_id}",
             'weekly_price_factor': listing_data_cached.get('weekly_price_factor'),
         }
@@ -549,6 +554,14 @@ class Pdp(BaseEndpoint):
 
         # return dict
         return {'amount': amount, 'currency': currency, 'symbol': currency_symbol}
+
+    @staticmethod
+    def __get_price_currency(pricing) -> str | None:
+        if pricing:
+            price_key = Pdp.__get_price_key(pricing)
+            return pricing['structuredStayDisplayPrice']['primaryLine'][price_key][0]
+
+        return None
 
     @staticmethod
     def __get_price_rate(pricing) -> int | None:
