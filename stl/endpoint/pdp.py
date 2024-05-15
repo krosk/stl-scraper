@@ -149,6 +149,7 @@ class Pdp(BaseEndpoint):
             data_cache[listing['id']] |= {
                 'price_rate':           self.__get_price_rate(pricing),
                 'price_per_date':       self.__get_price_detail(pricing, checkin, checkout),
+                'price_cleaning':       self.__get_price_cleaning(pricing),
                 'price_currency':       self.__get_price_currency(pricing),
                 'price_rate_type':      self.__get_rate_type(pricing)
             }
@@ -376,15 +377,16 @@ class Pdp(BaseEndpoint):
             'place_id': geography['placeId'],
             'price_rate': listing_data_cached.get('price_rate'),
             'price_per_date': listing_data_cached.get('price_per_date'),
+            'price_cleaning': listing_data_cached.get('price_cleaning'),
             'price_currency': listing_data_cached.get('price_currency'),
             'price_rate_type': listing_data_cached.get('price_rate_type'),
             'province': geography.get('province'),
-            'rating_accuracy': logging_data['accuracyRating'],
-            'rating_checkin': logging_data['checkinRating'],
-            'rating_cleanliness': logging_data['cleanlinessRating'],
-            'rating_communication': logging_data['communicationRating'],
-            'rating_location': logging_data['locationRating'],
-            'rating_value': logging_data['valueRating'],
+            'rating_accuracy': logging_data.get('accuracyRating', None),
+            'rating_checkin': logging_data.get('checkinRating', None),
+            'rating_cleanliness': logging_data.get('cleanlinessRating', None),
+            'rating_communication': logging_data.get('communicationRating', None),
+            'rating_location': logging_data.get('locationRating', None),
+            'rating_value': logging_data.get('valueRating', None),
             'review_count': listing_data_cached['review_count'],
             'reviews': reviews,
             'room_and_property_type': listing_data_cached[
@@ -392,7 +394,7 @@ class Pdp(BaseEndpoint):
             ],
             'room_type': listing_data_cached['room_type'],
             'room_type_category': listing_data_cached['room_type_category'],
-            'satisfaction_guest': logging_data['guestSatisfactionOverall'],
+            'satisfaction_guest': logging_data.get('guestSatisfactionOverall', None),
             'star_rating': listing_data_cached['star_rating'],
             'state': geography['state'],
             #'total_price': listing_data_cached.get('total_price'),
@@ -588,12 +590,20 @@ class Pdp(BaseEndpoint):
         return dates
 
     @staticmethod
+    def __get_entry_with_text(map, key, text):
+        for d in map:
+            if text in d.get(key):
+                return d
+        return None
+
+    @staticmethod
     def __get_price_detail(pricing, checkin: str = None, checkout: str = None) -> dict | None:
-        """ excluding fees """
+        """ night fees """
         if pricing:
-            price_key = Pdp.__get_price_key(pricing)
-            desc = pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'][0]['description']
-            if 'nights' in desc: # "'€\xa01,200 x 2 nights'"
+            # "'€\xa01,200 x 2 nights'"
+            entry = Pdp.__get_entry_with_text(pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'], 'description', 'night')
+            if entry:
+                desc = entry['description']
                 price = Pdp.extract_first_digit_group(desc)
                 if price:
                     dates = Pdp.__get_dates(checkin, checkout)
@@ -601,6 +611,20 @@ class Pdp(BaseEndpoint):
                     return price_per_date
             else:
                 raise ValueError(desc)
+
+        return None
+
+    @staticmethod
+    def __get_price_cleaning(pricing) -> dict | None:
+        """ cleaning fees """
+        if pricing:
+            # 'Cleaning fee'
+            entry = Pdp.__get_entry_with_text(pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'], 'description', 'Cleaning')
+            if entry:
+                # "'€\xa025'"
+                return Pdp.extract_first_digit_group(entry['priceString'])
+            else:
+                return 0
 
         return None
 

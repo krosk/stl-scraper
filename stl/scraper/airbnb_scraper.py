@@ -63,8 +63,8 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
                     '{}{} {}'.format(listing['price_currency'],
                                      listing['price_rate'],
                                     listing['price_rate_type']),
-                    str(listing['bedrooms']) +
-                    'br' if listing['bedrooms'] else '0br',
+                    str(listing['person_capacity']) +
+                    'pr' if listing['person_capacity'] else '0pr',
                     '{:.2f}ba'.format(listing['bathrooms']),
                     listing['room_and_property_type'],
                     '- {} -'.format(listing['neighborhood']
