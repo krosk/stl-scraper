@@ -42,7 +42,7 @@ function updateMarkers() {
                                 });
                                 let marker = L.marker([item.latitude, item.longitude], { icon });
                                 marker.addTo(map);
-                                marker.bindPopup(`<a href="${item.url}">${item.name}</a><br>${item.room_type}<br>${item.house_rules}`);
+                                marker.bindPopup(`<a target="_blank" href="${item.url}">${item.name}</a><br>${item.room_type}<br>${item.house_rules}`);
                             }
                         }
                     }
