@@ -10,6 +10,9 @@
     <div id="map"></div>
     <label for="date-selector">Date:</label>
     <input type="date" id="date-selector" onchange="updateMarkers()">
+    <button id="prevDayBtn" onclick="changeDate(-1)">Previous Day</button>
+    <button id="nextDayBtn" onclick="changeDate(1)">Next Day</button>
+
     <label for="capacity-selector">Capacity:</label>
     <input type="number" id="capacity-selector" min="1" max="8" onchange="updateMarkers()">
     <p id="error-message"></p>
