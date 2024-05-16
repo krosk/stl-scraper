@@ -37,7 +37,7 @@ class BaseEndpoint(ABC):
         headers = {'x-airbnb-api-key': self._api_key}
         max_attempts = 3
         while attempts < max_attempts:
-            sleep(randint(0, 2))  # do a little throttling
+            #sleep(0.5)  # do a little throttling
             attempts += 1
             try:
                 response = requests.request(method, url, headers=headers, data=data)

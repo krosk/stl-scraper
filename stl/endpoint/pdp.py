@@ -231,7 +231,7 @@ class Pdp(BaseEndpoint):
 
     # # parse pdp logging data
     def __parse_pdp_logging_data(self, data: dict) -> dict:
-        return self.__parse_pdp_metadata(data)['loggingContext']['eventDataLogging']
+        return self.__parse_pdp_metadata(data).get('loggingContext', {}).get('eventDataLogging', None)
 
     # # parse pdp sections
     def __parse_pdp_subsections(self, data: dict) -> dict:
@@ -323,6 +323,9 @@ class Pdp(BaseEndpoint):
 
         # # logging data -> ratings
         logging_data = self.__parse_pdp_logging_data(data)
+        if logging_data is None:
+            return {}
+
         listing_id = logging_data['listingId']
 
         # # reviews

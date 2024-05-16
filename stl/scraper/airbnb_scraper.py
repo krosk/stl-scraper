@@ -51,11 +51,14 @@ class AirbnbSearchScraper(AirbnbScraperInterface):
                         'Duplicate listing: {}'.format(listing_id))
                     continue  # skip duplicates
                 self.__ids_seen.add(listing_id)
-                n_listings += 1
                 #reviews = self.__reviews.get_reviews(listing_id)
                 reviews = [] # skip review as list, not of interest
                 listing = self.__pdp.get_listing(
                     listing_id, data_cache, self.__geography, reviews)
+                if 'id' not in listing:
+                    self.__logger.error(f"Issue in getting listing {listing_id}")
+                    continue 
+                n_listings += 1
 
                 msg = '{:>4} {:<12} {:>12} {:<5}{:<9}{} {:<1} {} ({})'.format(
                     '#' + str(n_listings),
