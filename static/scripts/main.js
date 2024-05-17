@@ -179,5 +179,6 @@ async function fetchRent(){
     await micropip.install('python-dotenv==1.0.0');
     await micropip.install('requests==2.28.2');
     await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl')
+    await micropip.install('stlscraper-1.0-py3-none-any.whl')
     console.log(pyodide.runPython("import requests; requests.get('http://www.baidu.com')"));
 }
