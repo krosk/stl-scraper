@@ -1,5 +1,6 @@
 // scripts/main.js
 var map;
+var myChart;
 
 // Function to generate the icon HTML based on the number
 function generateIconHTML(number, currency, capacity) {
@@ -19,6 +20,9 @@ function updateMarkers() {
     const capacityFilterInput = document.getElementById('capacity-selector');
     const thresholdCapacity = parseInt(capacityFilterInput.value);
 
+    const maxPlotInput = document.getElementById('max-plot');
+    const maxPlot = parseInt(maxPlotInput.value);
+
     fetch('/static/data.json')
         .then(response => response.json())
         .then(data => {
@@ -27,27 +31,41 @@ function updateMarkers() {
                 if (layer instanceof L.Marker) layer.remove();
             });
 
+            let highlight_plot_data = [];
+            let other_plot_data = [];
+
             for (let key in data) {
                 if (data.hasOwnProperty(key)) {
                     const item = data[key];
                     for (let date in item.price_per_date) {
-                        if (item.price_per_date.hasOwnProperty(date) && thresholdCapacity == item.person_capacity) {
+                        if (item.price_per_date.hasOwnProperty(date)) {
                             // Check if the marker's date matches the selected date
                             if (date === selectedDateString) {
-                                let icon = L.divIcon({
-                                    html: generateIconHTML(item.price_per_date[date], item.price_currency, item.person_capacity),
-                                    className: 'custom-marker',
-                                    iconSize: [30, 30], // Adjust as needed
-                                    iconAnchor: [15, 15], // Adjust as needed
-                                });
-                                let marker = L.marker([item.latitude, item.longitude], { icon });
-                                marker.addTo(map);
-                                marker.bindPopup(`<a target="_blank" href="${item.url}">${item.name}</a><br>${item.room_type}<br>${item.house_rules}`);
+                                if (thresholdCapacity == item.person_capacity) {
+                                    let icon = L.divIcon({
+                                        html: generateIconHTML(item.price_per_date[date], item.price_currency, item.person_capacity),
+                                        className: 'custom-marker',
+                                        iconSize: [30, 30], // Adjust as needed
+                                        iconAnchor: [15, 30], // Adjust as needed
+                                    });
+                                    let marker = L.marker([item.latitude, item.longitude], { icon });
+                                    marker.addTo(map);
+                                    marker.bindPopup(`<a target="_blank" href="${item.url}">${item.name}</a><br>${item.room_type}<br>${item.house_rules}`);
+                                    highlight_plot_data.push({x: item.person_capacity, y: item.price_per_date[date]});
+                                } else {
+                                    other_plot_data.push({x: item.person_capacity, y: item.price_per_date[date]});
+                                }
                             }
                         }
                     }
                 }
             }
+
+            myChart.data.datasets[0].data = highlight_plot_data;
+            myChart.data.datasets[1].data = other_plot_data;
+            myChart.options.scales.y.max = maxPlot;
+
+            myChart.update();
         })
         .catch(error => {
             document.getElementById('error-message').textContent = `Error loading data: ${error.message}`;
@@ -102,6 +120,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Set default capacity
     document.getElementById('capacity-selector').value = 4;
+
+    // Create a new Chart instance
+    const _data = {
+        datasets: [
+            {
+                label: 'Selected guest count',
+                data: []
+            },
+            {
+                label: 'Other guest count',
+                data: []
+            }
+        ]
+    };
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const config =  {
+        type: 'scatter',
+        data: _data,
+        options: {
+            animation: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            title: {
+                display: true,
+                text: 'Rent distribution'
+                }
+            },
+            scales: {
+                x: {
+                    min: 1,
+                    max: 8
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        },
+    };
+    myChart = new Chart(ctx, config);
 
     // Initialize the map with markers based on the current date
     updateMarkers();

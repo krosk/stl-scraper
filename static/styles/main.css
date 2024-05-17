@@ -4,7 +4,7 @@ body {
 }
 
 #map {
-    height: 800px;
+    height: 600px;
     width: 100%;
 }
 
@@ -19,4 +19,9 @@ body {
     color: yellow;
     font-size: 10px;
     text-align: center; /* Add this line to center text horizontally */
+}
+
+#myChart {
+    height: 100px;
+    max-width: 100%;
 }

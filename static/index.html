@@ -13,15 +13,22 @@
     <button id="prevDayBtn" onclick="changeDate(-1)">Previous Day</button>
     <button id="nextDayBtn" onclick="changeDate(1)">Next Day</button>
 
-    <label for="capacity-selector">Capacity:</label>
+    <label for="capacity-selector">Guests:</label>
     <input type="number" id="capacity-selector" min="1" max="8" onchange="updateMarkers()">
     <button id="prevCapacityBtn" onclick="changeCapacity(-1)">-1</button>
     <button id="nextCapacityBtn" onclick="changeCapacity(1)">+1</button>
+    
+    <label for="max-plot">Max rent plot:</label>
+    <input type="number" id="max-plot" onchange="updateMarkers()">
+    
+    <button id="update-button" onclick="updateMarkers()">Update Markers</button>
 
-    <p id="error-message"></p>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="/static/scripts/main.js"></script>
-    <button id="update-button" onclick="updateMarkers()">Update Markers</button>
+
+    <canvas id="myChart"></canvas>
+    <p id="error-message"></p>
 </body>
 </html>
