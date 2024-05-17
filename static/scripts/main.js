@@ -169,5 +169,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function fetchRent(){
     let pyodide = await loadPyodide();
-    console.log(pyodide.runPython("1 + 2"));
+    await pyodide.loadPackage("micropip");
+    const micropip = pyodide.pyimport("micropip");
+    await micropip.install('urllib3==1.26.18');
+    await micropip.install('elasticsearch==8.4.3');
+    await micropip.install('geopy==2.3.0');
+    await micropip.install('lxml==4.9.3');
+    await micropip.install('pycountry==23.12.11');
+    await micropip.install('python-dotenv==1.0.0');
+    await micropip.install('requests==2.28.2');
+    await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl')
+    console.log(pyodide.runPython("import requests; requests.get('http://www.baidu.com')"));
 }
