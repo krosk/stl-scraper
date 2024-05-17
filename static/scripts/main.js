@@ -105,7 +105,6 @@ function changeCapacity(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    
     map = L.map('map').setView([48.845916516034436, 2.5516667962951844], 14);
     
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -167,3 +166,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize the map with markers based on the current date
     updateMarkers();
 });
+
+async function fetchRent(){
+    let pyodide = await loadPyodide();
+    console.log(pyodide.runPython("1 + 2"));
+}
