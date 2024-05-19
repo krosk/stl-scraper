@@ -6,7 +6,7 @@ from abc import ABC
 from logging import Logger
 from random import randint
 from time import sleep
-from urllib.parse import urlunparse, urlencode
+from urllib.parse import urlunparse, urlencode, quote
 
 from stl.exception.api import ApiException, ForbiddenException
 
@@ -16,8 +16,9 @@ class BaseEndpoint(ABC):
     SOURCE = 'airbnb'
 
     # initialize the class
-    def __init__(self, api_key: str, currency: str, logger: Logger, locale: str = 'en'):
+    def __init__(self, api_key: str, currency: str, logger: Logger, cors_api_key: str = '', locale: str = 'en'):
         self._api_key = api_key
+        self._cors_api_key = cors_api_key
         self._currency = currency
         self._locale = locale
         self._logger = logger
@@ -34,16 +35,22 @@ class BaseEndpoint(ABC):
             data = {}
 
         attempts = 0
-        headers = {'x-airbnb-api-key': self._api_key}
+        headers = {
+            'x-airbnb-api-key': self._api_key,
+            'x-cors-proxy-api-key': self._cors_api_key,
+            'origin': 'https://www.airbnb.com'
+        }
         max_attempts = 3
         while attempts < max_attempts:
             #sleep(0.5)  # do a little throttling
             attempts += 1
             try:
-                response = requests.request(method, url, headers=headers, data=data)
+                new_url = 'https://steak.kurokrosk.workers.dev/' + url
+                response = requests.request(method, new_url, headers=headers, data=data)
                 response.raise_for_status()  # Check for HTTP errors
             except requests.exceptions.HTTPError as errh:
                 traceback.print_exc()
+                response_json = response.json()
                 continue
             except requests.exceptions.ConnectionError as errc:
                 #traceback.print_exc()
@@ -62,7 +69,7 @@ class BaseEndpoint(ABC):
             if not errors:
                 return response_json
 
-            self.__handle_api_error(url, errors)
+            self.__handle_api_error(url, errors, response_json)
 
         raise ApiException(
             ['Could not complete API {} request to "{}"'.format(method, url)])
@@ -75,7 +82,7 @@ class BaseEndpoint(ABC):
         query['extensions'] = json.dumps(
             query['extensions'], separators=(',', ':'))
 
-    def __handle_api_error(self, url: str, errors: list):
+    def __handle_api_error(self, url: str, errors: list, json = None):
         error = errors.pop()
         if isinstance(error, dict):
             if error.get('extensions'):
@@ -100,4 +107,5 @@ class BaseEndpoint(ABC):
                 self._logger.warning(error['message'])
                 return
 
+        self._logger.error(json)
         raise ApiException(errors)

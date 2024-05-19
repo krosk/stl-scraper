@@ -178,7 +178,9 @@ async function fetchRent(){
     await micropip.install('pycountry==23.12.11');
     await micropip.install('python-dotenv==1.0.0');
     await micropip.install('requests==2.28.2');
+    await micropip.install('pyodide-http')
     await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl')
     await micropip.install('stlscraper-1.0-py3-none-any.whl')
-    console.log(pyodide.runPython("import requests; requests.get('http://www.baidu.com')"));
+    console.log(pyodide.runPython(`import pyodide_http; pyodide_http.patch_all(); import requests; headers = {"x-airbnb-api-key": "d306zoyjsyarp7ifhu67rjxn52tv0t20", "x-cors-proxy-api-key": "EZWTLwVEqFnaycMzdhBx", "origin": "https://www.airbnb.com"}; cors = 'https://steak.kurokrosk.workers.dev/'; url = 'https://www.airbnb.com/api/v3/ExploreSearch?operationName=ExploreSearch&locale=en&currency=EUR&_cb=ld7rar1fhh6if&extensions={"persistedQuery":{"version":1,"sha256Hash":"13aa9971e70fbf5ab888f2a851c765ea098d8ae68c81e1f4ce06e2046d91b6ea"}}'; url`));
+    console.log(pyodide.runPython(`response = requests.get(cors + url, headers=headers); response.text`));
 }

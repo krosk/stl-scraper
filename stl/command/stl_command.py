@@ -88,7 +88,7 @@ Global Options:
             scraper.run(source, self.__args.get('--updated'))
 
         elif self.__args.get('data'):
-            pdp = Pdp(os.getenv('AIRBNB_API_KEY'), currency, self.__logger)
+            pdp = Pdp(os.getenv('AIRBNB_API_KEY'), currency, self.__logger, cors_api_key=os.getenv('CORS_API_KEY'))
             print(json.dumps(pdp.get_raw_listing(self.__args.get('<listingId>'))))
 
         elif self.__args.get('pricing'):
@@ -96,7 +96,7 @@ Global Options:
             checkin = self.__args.get('--checkin')
             checkout = self.__args.get('--checkout')
             pricing = Pricing(os.getenv('AIRBNB_API_KEY'),
-                              currency, self.__logger)
+                              currency, self.__logger, cors_api_key=os.getenv('CORS_API_KEY'))
             total = pricing.get_pricing(checkin, checkout, listing_id)
             print('https://www.airbnb.com/rooms/{} - {} to {}: {}'.format(listing_id,
                   checkin, checkout, total))
@@ -113,15 +113,16 @@ Global Options:
     ) -> AirbnbScraperInterface:
         """Create scraper of given type using given parameters."""
         api_key = os.getenv('AIRBNB_API_KEY')
+        cors_api_key = os.getenv('CORS_API_KEY')
 
         if scraper_type == 'search':
-            explore = Explore(api_key, currency, self.__logger)
-            pdp = Pdp(api_key, currency, self.__logger)
-            reviews = Reviews(api_key, currency, self.__logger)
+            explore = Explore(api_key, currency, self.__logger, cors_api_key=cors_api_key)
+            pdp = Pdp(api_key, currency, self.__logger, cors_api_key=cors_api_key)
+            reviews = Reviews(api_key, currency, self.__logger, cors_api_key=cors_api_key)
             return AirbnbSearchScraper(explore, pdp, reviews, persistence, self.__logger)
         elif scraper_type == 'calendar':
-            pricing = Pricing(api_key, currency, self.__logger)
-            calendar = Calendar(api_key, currency, self.__logger, pricing)
+            pricing = Pricing(api_key, currency, self.__logger, cors_api_key=cors_api_key)
+            calendar = Calendar(api_key, currency, self.__logger, pricing, cors_api_key=cors_api_key)
             return AirbnbCalendarScraper(calendar, persistence, self.__logger)
         else:
             raise RuntimeError('Unknown scraper type: %s' % scraper_type)
