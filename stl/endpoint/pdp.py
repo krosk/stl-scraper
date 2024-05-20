@@ -604,15 +604,25 @@ class Pdp(BaseEndpoint):
     def __get_price_detail(pricing, checkin: str = None, checkout: str = None) -> dict | None:
         """ night fees """
         if pricing:
-            # "'€\xa01,200 x 2 nights'"
-            entry = Pdp.__get_entry_with_text(pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'], 'description', 'night')
-            if entry:
-                desc = entry['description']
-                price = Pdp.extract_first_digit_group(desc)
-                if price:
-                    dates = Pdp.__get_dates(checkin, checkout)
-                    price_per_date = {date: price for date in dates}
-                    return price_per_date
+            if pricing['structuredStayDisplayPrice']['explanationData']:
+                # "'€\xa01,200 x 2 nights'"
+                entry = Pdp.__get_entry_with_text(pricing['structuredStayDisplayPrice']['explanationData']['priceDetails'][0]['items'], 'description', 'night')
+                if entry:
+                    desc = entry['description']
+                    price = Pdp.extract_first_digit_group(desc)
+                    if price:
+                        dates = Pdp.__get_dates(checkin, checkout)
+                        price_per_date = {date: price for date in dates}
+                        return price_per_date
+            elif pricing['structuredStayDisplayPrice']['primaryLine']:
+                entry = Pdp.__get_entry_with_text(pricing['structuredStayDisplayPrice']['primaryLine'], 'price', 'night')
+                if entry:
+                    desc = entry['description']
+                    price = Pdp.extract_first_digit_group(desc)
+                    if price:
+                        dates = Pdp.__get_dates(checkin, checkout)
+                        price_per_date = {date: price for date in dates}
+                        return price_per_date
             else:
                 raise ValueError(desc)
 
