@@ -38,7 +38,7 @@ def update_listing(listing_dict: dict, listing_list: list) -> dict:
 
 class Json(PersistenceInterface):
     def __init__(self, json_path: str):
-        self.__json_path = os.path.join(json_path, 'static', 'data.json')
+        self.__json_path = os.path.join(json_path, 'data.json')
 
     def save(self, query: str, listings: list):
         listing_dict = load_json_dict(self.__json_path)

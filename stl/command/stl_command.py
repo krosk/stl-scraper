@@ -23,7 +23,7 @@ class StlCommand:
 
 Usage:
     stl.py search <query> [--interval=<interval>] [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
-[--roomTypes=<roomTypes>] [--storage=<storage>] [-v|--verbose]
+[--roomTypes=<roomTypes>] [--storage=<storage> [--projectpath=<projectpath>]] [-v|--verbose]
     stl.py calendar (<listingId> | --all) [--updated=<updated>]
     stl.py pricing <listingId> --checkin=<checkin> --checkout=<checkout>
     stl.py data <listingId>
@@ -46,6 +46,7 @@ Global Options:
     --currency=<currency>  "USD", "EUR", etc. (default: USD)
     --source=<source>      Only allows "airbnb" [default: airbnb]
     --storage=<storage>    csv or elasticsearch or json (default: csv)
+    --projectpath=<projectpath>  Target path for persistence
     -v, --verbose          Verbose logging output
 """
 
@@ -64,8 +65,7 @@ Global Options:
         return logging.getLogger(__class__.__module__.lower())
 
     def execute(self):
-        project_path = os.path.dirname(
-            os.path.realpath('{}/../../'.format(__file__)))
+        project_path = self.__args.get('--projectpath') or os.path.dirname(os.path.realpath('{}/../../'.format(__file__)))
         currency = self.__args.get(
             '--currency') or os.getenv('SEARCH_CURRENCY', 'USD')
         if self.__args.get('search'):
