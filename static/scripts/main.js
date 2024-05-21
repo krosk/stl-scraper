@@ -203,7 +203,7 @@ async function fetchRent(){
     const formattedCheckinDate = checkinDate.toISOString().split('T')[0];
     const formattedCheckoutDate = checkoutDate.toISOString().split('T')[0];
 
-    let query = `stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`;
+    let query = `stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--currency=EUR", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`;
     console.log(query)
 
     pyodide.runPython(query);

@@ -23,7 +23,7 @@ class StlCommand:
 
 Usage:
     stl.py search <query> [--interval=<interval>] [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
-[--roomTypes=<roomTypes>] [--storage=<storage> [--projectpath=<projectpath>]] [-v|--verbose]
+[--roomTypes=<roomTypes>] [--storage=<storage> [--projectpath=<projectpath>]] [--currency=<currency>] [-v|--verbose]
     stl.py calendar (<listingId> | --all) [--updated=<updated>]
     stl.py pricing <listingId> --checkin=<checkin> --checkout=<checkout>
     stl.py data <listingId>
