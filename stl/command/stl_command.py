@@ -23,7 +23,7 @@ class StlCommand:
 
 Usage:
     stl.py search <query> [--interval=<interval>] [--radius=<radius>] [--checkin=<checkin> --checkout=<checkout> [--priceMin=<priceMin>] [--priceMax=<priceMax>]] \
-[--roomTypes=<roomTypes>] [--storage=<storage> [--projectpath=<projectpath>]] [--currency=<currency>] [-v|--verbose]
+[--roomTypes=<roomTypes>] [--storage=<storage> [--projectpath=<projectpath>]] [--currency=<currency>] [--search_by_map=<search_by_map> [--ne_lat=<ne_lat>] [--ne_lng=<ne_lng>] [--sw_lat=<sw_lat>] [--sw_lng=<sw_lng>]] [-v|--verbose]
     stl.py calendar (<listingId> | --all) [--updated=<updated>]
     stl.py pricing <listingId> --checkin=<checkin> --checkout=<checkout>
     stl.py data <listingId>
@@ -38,6 +38,11 @@ Options:
     --priceMin=<priceMin>  Minimum nightly or monthly price
     --priceMax=<priceMax>  Maximum nightly or monthly price
     --radius=<radius>      Radius for search
+    --search_by_map=<search_by_map>  Search within a map box
+    --ne_lat=<ne_lat>      Search within a map box
+    --ne_lng=<ne_lng>      Search within a map box
+    --sw_lat=<sw_lat>      Search within a map box
+    --sw_lng=<sw_lng>      Search within a map box
     --updated=<updated>    Only update listings not updated in given period. Prevents updating listings that have been \
 recently updated. [default: 1d]
     --all                  Update calendar for all listings (requires Elasticsearch backend)
@@ -176,6 +181,13 @@ Global Options:
         
         if self.__args.get('--radius'):
             params['radius'] = self.__args['--radius']
+        
+        if self.__args.get('--search_by_map'):
+            params['searchByMap'] = "true"
+            params['neLat'] = self.__args['--ne_lat']
+            params['neLng'] = self.__args['--ne_lng']
+            params['swLat'] = self.__args['--sw_lat']
+            params['swLng'] = self.__args['--sw_lng']
 
         return params
 

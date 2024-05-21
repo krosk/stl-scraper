@@ -203,7 +203,15 @@ async function fetchRent(){
     const formattedCheckinDate = checkinDate.toISOString().split('T')[0];
     const formattedCheckoutDate = checkoutDate.toISOString().split('T')[0];
 
-    let query = `stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--currency=EUR", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`;
+    const bounds = map.getBounds();
+    const northEast = bounds.getNorthEast();
+    const southWest = bounds.getSouthWest();
+    const neLat = northEast.lat;
+    const neLng = northEast.lng;
+    const swLat = southWest.lat;
+    const swLng = southWest.lng;
+
+    let query = `stl.main.main(['search', "*", "--currency=EUR", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--search_by_map=true", "--ne_lat=${neLat}", "--ne_lng=${neLng}", "--sw_lat=${swLat}", "--sw_lng=${swLng}", "--storage=json", "--projectpath=/", '-v'])`;
     console.log(query)
 
     pyodide.runPython(query);
