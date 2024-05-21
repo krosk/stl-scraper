@@ -35,23 +35,26 @@
         <main>
             <div class="row">
                 <ul class="tabs col s12">
-                    <li class="tab"><a class="active" href="#navmap">Map</a></li>
+                    <li class="tab"><a href="#navmap">Map</a></li>
                     <li class="tab"><a href="#navchart">Chart</a></li>
                     <li class="tab"><a href="#navsettings">Settings</a></li>
                 </ul>
             </div>
     
             <div class="row">
+                <button class="col s1" id="prevDayBtn" onclick="changeDate(-1)">Previous Day</button>
+                <div class="col s4 input-field">
+                    <input class="datepicker" type="text" id="date-selector">
                     <label for="date-selector">Date</label>
-                    <button class="col s1" id="prevDayBtn" onclick="changeDate(-1)">Previous Day</button>
-                    <input class=" col s2 datepicker" type="text" id="date-selector">
-                    <button class="col s1" id="nextDayBtn" onclick="changeDate(1)">Next Day</button>
-
-                    <label for="capacity-selector">Guests:</label>
-                    <button class="col s1" id="prevCapacityBtn" onclick="changeCapacity(-1)">-1</button>
-                    <input class="col s2" type="number" id="capacity-selector" min="1" max="8" onchange="updateMarkers()">
-                    <button class="col s1" id="nextCapacityBtn" onclick="changeCapacity(1)">+1</button>
                 </div>
+                <button class="col s1" id="nextDayBtn" onclick="changeDate(1)">Next Day</button>
+
+                <button class="col s1" id="prevCapacityBtn" onclick="changeCapacity(-1)">-1</button>
+                <div class="col s4 input-field">
+                    <input type="number" id="capacity-selector" placeholder=" " min="1" max="8" onchange="updateMarkers()">
+                    <label for="capacity-selector">Guests capacity</label>
+                </div>
+                <button class="col s1" id="nextCapacityBtn" onclick="changeCapacity(1)">+1</button>
             </div>
     
             <div id="navmap" class="row ">
