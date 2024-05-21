@@ -101,6 +101,8 @@ function changeCapacity(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    M.AutoInit();
+    
     const mapCenterLat = localStorage.getItem('map_center_lat') || 48.845916516034436;
     const mapCenterLng = localStorage.getItem('map_center_lng') || 2.5516667962951844;
 
@@ -174,8 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
         },
     };
     myChart = new Chart(ctx, config);
-
-    M.AutoInit();
 
     initializePython();
 });
