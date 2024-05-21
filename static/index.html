@@ -41,40 +41,35 @@
                 </ul>
             </div>
     
-            <div class="row">
+            <div class="row" style="gap: 5px;">
                 <a class="btn tonal waves-effect waves-light col s1" onclick="changeDate(-1)">-</a>
-                <div class="col s10 m4 input-field">
+                <div class="col s10 m4 l2 input-field">
                     <input class="datepicker" type="text" id="date-selector">
                     <label for="date-selector">Date</label>
                 </div>
                 <a class="btn tonal waves-effect waves-light col s1" onclick="changeDate(1)">+</a>
 
                 <a class="btn tonal waves-effect waves-light col s1" onclick="changeCapacity(-1)">-</a>
-                <div class="col s10 m4 input-field">
+                <div class="col s10 m4 l2 input-field">
                     <input type="number" id="capacity-selector" placeholder=" " min="1" max="8" onchange="updateMarkers()">
                     <label for="capacity-selector">Guests capacity</label>
                 </div>
                 <a class="btn tonal waves-effect waves-light col s1" onclick="changeCapacity(1)">+</a>
-            </div>
 
-            <div class="row">
-                <a class="btn waves-effect waves-light col s6" id="fetch-button" onclick="fetchRent()">Fetch rent</a>
-                <a class="btn tonal waves-effect waves-light col s6" id="reset-button" onclick="resetData()">Reset rent</a>
+                <a class="btn waves-effect waves-light col s6 m6 l2" id="fetch-button" onclick="fetchRent()">Fetch rent</a>
+                <a class="btn tonal waves-effect waves-light col s6 m6 l2" id="reset-button" onclick="resetData()">Reset rent</a>
             </div>
     
             <div id="navmap" class="row">
                 <div class="col s12">
                     <div id="map"></div>
                 </div>
-                <a class="btn tonal col s12" id="update-button" onclick="updateMarkers()">Update Markers</a>
             </div>
     
             <div id="navchart" class="row">
-                <div class="col s12">
-                    <canvas id="myChart"></canvas>
-                    <label for="max-plot">Max rent plot:</label>
-                    <input type="number" id="max-plot" onchange="updateMarkers()">
-                </div>
+                <canvas class="col s12" id="myChart"></canvas>
+                <label for="max-plot">Max rent plot:</label>
+                <input type="number" id="max-plot" onchange="updateMarkers()">
             </div>
             
             <div id="navsettings" class="row">
