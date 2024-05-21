@@ -101,7 +101,7 @@ function changeCapacity(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    map = L.map('map').setView([48.845916516034436, 2.5516667962951844], 14);
+    map = L.map('map').setView([48.845916516034436, 2.5516667962951844], 17);
     
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -160,10 +160,20 @@ document.addEventListener("DOMContentLoaded", function () {
     myChart = new Chart(ctx, config);
 
     initializePython();
-
-    // Initialize the map with markers based on the current date
-    updateMarkers();
 });
+
+function showMain() {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+
+    // map must be force-refreshed
+    map.invalidateSize();
+}
+
+function hideMain() {
+    document.getElementById('main').style.display = 'none';
+    document.getElementById('loader').style.display = 'flex';
+}
 
 function resetData(){
     localStorage.setItem("data", "{}");
@@ -190,6 +200,9 @@ async function initializePython(){
     pyodide.runPython(`os.environ["AIRBNB_API_KEY"] = "d306zoyjsyarp7ifhu67rjxn52tv0t20"`);
     pyodide.runPython(`os.environ["CORS_API_KEY"] = "EZWTLwVEqFnaycMzdhBx"`);
     pyodide.runPython(`import stl.main;`);
+
+    // initializePython is async, so displaying the main div must happen next
+    showMain();
 }
 
 async function fetchRent(){
@@ -217,6 +230,8 @@ async function fetchRent(){
     pyodide.runPython(query);
     let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
+
+    showMain();
 
     updateMarkers();
 }

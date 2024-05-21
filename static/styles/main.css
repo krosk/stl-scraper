@@ -3,6 +3,13 @@ body {
     font-family: Arial, sans-serif;
 }
 
+#loader {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 #map {
     height: 600px;
     width: 100%;
