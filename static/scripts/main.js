@@ -168,6 +168,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     myChart = new Chart(ctx, config);
 
+    M.AutoInit();
+
     initializePython();
 });
 
