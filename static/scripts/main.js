@@ -116,11 +116,18 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
-    // Set the date selector to today's date when the page loads
+    // dates elector
     let today = new Date();
     let currentDayOfMonth = today.getDate();
     today.setDate(currentDayOfMonth + 2);
-    document.getElementById('date-selector').valueAsDate = today;
+
+    var elems = document.querySelectorAll('.datepicker');
+    var instances = M.Datepicker.init(elems, {
+        format: 'yyyy-mm-dd',
+        defaultDate: today,
+        setDefaultDate: true,
+        onSelect: updateMarkers
+    });
 
     // Set default capacity
     document.getElementById('capacity-selector').value = 4;
