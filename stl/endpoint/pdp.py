@@ -231,6 +231,8 @@ class Pdp(BaseEndpoint):
 
     # # parse pdp logging data
     def __parse_pdp_logging_data(self, data: dict) -> dict:
+        if self.__parse_pdp_metadata(data).get('loggingContext', None) is None:
+            return None
         return self.__parse_pdp_metadata(data).get('loggingContext', {}).get('eventDataLogging', None)
 
     # # parse pdp sections

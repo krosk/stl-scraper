@@ -1,6 +1,7 @@
 // scripts/main.js
 var map;
 var myChart;
+var pyodide;
 
 // Function to generate the icon HTML based on the number
 function generateIconHTML(number, currency, capacity) {
@@ -158,12 +159,20 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     myChart = new Chart(ctx, config);
 
+    initializePython();
+
     // Initialize the map with markers based on the current date
     updateMarkers();
 });
 
-async function fetchRent(){
-    let pyodide = await loadPyodide();
+function resetData(){
+    localStorage.setItem("data", "{}");
+
+    updateMarkers();
+}
+
+async function initializePython(){
+    pyodide = await loadPyodide();
     await pyodide.loadPackage("micropip");
     const micropip = pyodide.pyimport("micropip");
     await micropip.install('urllib3==1.26.18');
@@ -175,15 +184,19 @@ async function fetchRent(){
     await micropip.install('requests==2.28.2');
     await micropip.install('pyodide-http');
     await micropip.install("ssl"); // required by elasticsearch, could be removed?
-    await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl')
-    await micropip.install('stlscraper-1.0-py3-none-any.whl')
+    await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl');
+    await micropip.install('stlscraper-1.0-py3-none-any.whl');
     pyodide.runPython(`import pyodide_http; pyodide_http.patch_all(); import requests; import os;`);
     pyodide.runPython(`os.environ["AIRBNB_API_KEY"] = "d306zoyjsyarp7ifhu67rjxn52tv0t20"`);
     pyodide.runPython(`os.environ["CORS_API_KEY"] = "EZWTLwVEqFnaycMzdhBx"`);
-    pyodide.runPython(`import stl.main; stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--checkin=2024-06-30", "--checkout=2024-07-02", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`);
+    pyodide.runPython(`import stl.main;`);
+}
+
+async function fetchRent(){
+    let data = localStorage.getItem('data') || "{}";
+    pyodide.FS.writeFile("/data.json", data, { encoding: "utf8" });
+
+    pyodide.runPython(`stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--checkin=2024-06-30", "--checkout=2024-07-02", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`);
     let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
-
-    //console.log(pyodide.runPython(`headers = {"x-airbnb-api-key": "d306zoyjsyarp7ifhu67rjxn52tv0t20", "x-cors-proxy-api-key": "EZWTLwVEqFnaycMzdhBx", "origin": "https://www.airbnb.com"}; cors = 'https://steak.kurokrosk.workers.dev/'; url = 'https://www.airbnb.com/api/v3/ExploreSearch?operationName=ExploreSearch&locale=en&currency=EUR&_cb=ld7rar1fhh6if&extensions={"persistedQuery":{"version":1,"sha256Hash":"13aa9971e70fbf5ab888f2a851c765ea098d8ae68c81e1f4ce06e2046d91b6ea"}}'; url`));
-    //console.log(pyodide.runPython(`response = requests.get(cors + url, headers=headers); response.text`));
 }
