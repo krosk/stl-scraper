@@ -101,12 +101,15 @@ function changeCapacity(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    const mapCenterLat = localStorage.getItem('map_center_lat') || 48.845916516034436;
+    const mapCenterLng = localStorage.getItem('map_center_lng') || 2.5516667962951844;
+
     // initialize map
-    map = L.map('map').setView([48.845916516034436, 2.5516667962951844], 17);
+    map = L.map('map').setView([mapCenterLat, mapCenterLng], 17);
     
     map.addEventListener('mousemove', function(ev) {
-        localStorage.setItem('map_center_lat', map.getCenter().Lat);
-        localStorage.setItem('map_center_lng', map.getCenter().Lng);
+        localStorage.setItem('map_center_lat', map.getCenter().lat);
+        localStorage.setItem('map_center_lng', map.getCenter().lng);
     });
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
