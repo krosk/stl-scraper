@@ -101,8 +101,14 @@ function changeCapacity(delta) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    // initialize map
     map = L.map('map').setView([48.845916516034436, 2.5516667962951844], 17);
     
+    map.addEventListener('mousemove', function(ev) {
+        localStorage.setItem('map_center_lat', map.getCenter().Lat);
+        localStorage.setItem('map_center_lng', map.getCenter().Lng);
+    });
+
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -230,8 +236,6 @@ async function fetchRent(){
     pyodide.runPython(query);
     let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
-
-    showMain();
 
     updateMarkers();
 }
