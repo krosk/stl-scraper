@@ -196,7 +196,19 @@ async function fetchRent(){
     let data = localStorage.getItem('data') || "{}";
     pyodide.FS.writeFile("/data.json", data, { encoding: "utf8" });
 
-    pyodide.runPython(`stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--checkin=2024-06-30", "--checkout=2024-07-02", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`);
+    let dateInput = document.getElementById('date-selector');
+    const checkinDate = new Date(dateInput.value);
+    const checkoutDate = new Date(dateInput.value);
+    checkoutDate.setDate(checkoutDate.getDate() + 2);
+    const formattedCheckinDate = checkinDate.toISOString().split('T')[0];
+    const formattedCheckoutDate = checkoutDate.toISOString().split('T')[0];
+
+    let query = `stl.main.main(['search', "Centre commercial Arcades, Noisy-Le-Grand, France", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--radius=10", "--storage=json", "--projectpath=/", '-v'])`;
+    console.log(query)
+
+    pyodide.runPython(query);
     let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
+
+    updateMarkers();
 }
