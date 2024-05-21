@@ -43,18 +43,23 @@
     
             <div class="row">
                 <button class="col s1" id="prevDayBtn" onclick="changeDate(-1)">Previous Day</button>
-                <div class="col s4 input-field">
+                <div class="col s10 m4 input-field">
                     <input class="datepicker" type="text" id="date-selector">
                     <label for="date-selector">Date</label>
                 </div>
                 <button class="col s1" id="nextDayBtn" onclick="changeDate(1)">Next Day</button>
 
                 <button class="col s1" id="prevCapacityBtn" onclick="changeCapacity(-1)">-1</button>
-                <div class="col s4 input-field">
+                <div class="col s10 m4 input-field">
                     <input type="number" id="capacity-selector" placeholder=" " min="1" max="8" onchange="updateMarkers()">
                     <label for="capacity-selector">Guests capacity</label>
                 </div>
                 <button class="col s1" id="nextCapacityBtn" onclick="changeCapacity(1)">+1</button>
+            </div>
+
+            <div class="row">
+                <button class="col s6" id="fetch-button" onclick="fetchRent()">Fetch rent</button>
+                <button class="col s6" id="reset-button" onclick="resetData()">Reset all data</button>
             </div>
     
             <div id="navmap" class="row ">
@@ -67,8 +72,6 @@
             <div id="navchart" class="row">
                 <div class="col s12">
                     <canvas id="myChart"></canvas>
-                    <button id="fetch-button" onclick="fetchRent()">Fetch Rent</button>
-                    <button id="reset-button" onclick="resetData()">Reset all data</button>
                     <label for="max-plot">Max rent plot:</label>
                     <input type="number" id="max-plot" onchange="updateMarkers()">
                 </div>
