@@ -35,37 +35,13 @@
         <main>
             <div class="row">
                 <ul class="tabs col s12">
-                    <li class="tab"><a class="active" href="#navmap">Map</a></li>
-                    <li class="tab"><a href="#navchart">Chart</a></li>
-                    <li class="tab"><a href="#navsettings">Settings</a></li>
+                    <li class="tab"><a class="active" href="#map">Map</a></li>
+                    <li class="tab"><a href="#chart">Chart</a></li>
+                    <li class="tab"><a href="#settings">Settings</a></li>
                 </ul>
             </div>
     
-            <div id="navmap" style="gap: 5px;">
-                <div id="navmapcontent">
-                    <div class="row">
-                        <a class="btn tonal waves-effect waves-light col s1" onclick="changeDate(-1)">-</a>
-                        <div class="col s10 m4 l2 input-field">
-                            <input class="datepicker" type="text" id="date-selector">
-                            <label for="date-selector">Date</label>
-                        </div>
-                        <a class="btn tonal waves-effect waves-light col s1" onclick="changeDate(1)">+</a>
-        
-                        <a class="btn tonal waves-effect waves-light col s1" onclick="changeCapacity(-1)">-</a>
-                        <div class="col s10 m4 l2 input-field">
-                            <input type="number" id="capacity-selector" placeholder=" " min="1" max="8" onchange="updateMarkers()">
-                            <label for="capacity-selector">Guests capacity</label>
-                        </div>
-                        <a class="btn tonal waves-effect waves-light col s1" onclick="changeCapacity(1)">+</a>
-        
-                        <a class="btn waves-effect waves-light col s6 m6 l2" id="fetch-button" onclick="fetchRent()">Fetch rent</a>
-                        <a class="btn tonal waves-effect waves-light col s6 m6 l2" id="reset-button" onclick="resetData()">Reset rent</a>
-                    </div>
-                    <div id="map"></div>
-                </div>
-            </div>
-    
-            <div id="navchart" style="gap: 5px;">
+            <div id="navcontent">
                 <div class="row">
                     <a class="btn tonal waves-effect waves-light col s1" onclick="changeDate(-1)">-</a>
                     <div class="col s10 m4 l2 input-field">
@@ -83,16 +59,21 @@
     
                     <a class="btn waves-effect waves-light col s6 m6 l2" id="fetch-button" onclick="fetchRent()">Fetch rent</a>
                     <a class="btn tonal waves-effect waves-light col s6 m6 l2" id="reset-button" onclick="resetData()">Reset rent</a>
-                    
+                </div>
+
+                <div id="map"></div>
+        
+                <div id="chart" style="gap: 5px;">
                     <canvas class="col s12" id="myChart"></canvas>
                     <label for="max-plot">Max rent plot:</label>
                     <input type="number" id="max-plot" onchange="updateMarkers()">
                 </div>
+                
+                <div id="settings" class="row">
+                    <p id="error-message"></p>
+                </div>
             </div>
             
-            <div id="navsettings" class="row">
-                <p id="error-message"></p>
-            </div>
         </main>
         
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
