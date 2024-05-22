@@ -11,9 +11,24 @@ body {
     align-items: center;
 }
 
-#map {
-    height: 600px;
+#main {
+    height: 100vh;
+}
+
+main {
+    height: 100%;
+}
+
+#navmapcontent {
+    height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
     width: 100%;
+}
+
+#map {
+    width: 100%;
+    flex-grow: 1;
 }
 
 .custom-marker {
