@@ -222,25 +222,24 @@ function resetData(){
     updateMarkers();
 }
 
+async function callPython(script, context) {
+    try {
+        const { results, error } = await asyncRun(script, context);
+        if (results) {
+            //console.log("pyodideWorker return results: ", results);
+            return results;
+        } else if (error) {
+            console.log("pyodideWorker error: ", error);
+        }
+    } catch (e) {
+        console.log(
+            `Error in pyodideWorker at ${e.filename}, Line: ${e.lineno}, ${e.message}`,
+        );
+    }
+}
+
 async function initializePython(){
-    pyodide = await loadPyodide();
-    await pyodide.loadPackage("micropip");
-    const micropip = pyodide.pyimport("micropip");
-    await micropip.install('urllib3==1.26.18');
-    await micropip.install('elasticsearch==8.4.3');
-    await micropip.install('geopy==2.3.0');
-    await micropip.install('lxml==4.9.3');
-    await micropip.install('pycountry==23.12.11');
-    await micropip.install('python-dotenv==1.0.0');
-    await micropip.install('requests==2.28.2');
-    await micropip.install('pyodide-http');
-    await micropip.install("ssl"); // required by elasticsearch, could be removed?
-    await micropip.install('https://www.piwheels.org/simple/docopt/docopt-0.6.2-py2.py3-none-any.whl');
-    await micropip.install('stlscraper-1.0-py3-none-any.whl');
-    pyodide.runPython(`import pyodide_http; pyodide_http.patch_all(); import requests; import os;`);
-    pyodide.runPython(`os.environ["AIRBNB_API_KEY"] = "d306zoyjsyarp7ifhu67rjxn52tv0t20"`);
-    pyodide.runPython(`os.environ["CORS_API_KEY"] = "EZWTLwVEqFnaycMzdhBx"`);
-    pyodide.runPython(`import stl.main;`);
+    await callPython();
 
     // initializePython is async, so displaying the main div must happen next
     showMain();
@@ -248,7 +247,7 @@ async function initializePython(){
 
 async function fetchRent(){
     let data = localStorage.getItem('data') || "{}";
-    pyodide.FS.writeFile("/data.json", data, { encoding: "utf8" });
+    //pyodide.FS.writeFile("/data.json", data, { encoding: "utf8" });
 
     let dateInput = document.getElementById('date-selector');
     const checkinDate = new Date(dateInput.value);
@@ -268,8 +267,9 @@ async function fetchRent(){
     let query = `stl.main.main(['search', "*", "--currency=EUR", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--search_by_map=true", "--ne_lat=${neLat}", "--ne_lng=${neLng}", "--sw_lat=${swLat}", "--sw_lng=${swLng}", "--storage=json", "--projectpath=/", '-v'])`;
     console.log(query)
 
-    pyodide.runPython(query);
-    let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
+    //pyodide.runPython(query);
+    const file = await callPython(query, {data: data});
+    //let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
 
     updateMarkers();
