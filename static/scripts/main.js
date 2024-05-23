@@ -83,6 +83,15 @@ function changeDate(days) {
     updateMarkers();
 }
 
+function changeRentMaxPlot(delta) {
+    const maxPlotInput = document.getElementById('max-plot');
+    const maxPlot = parseInt(maxPlotInput.value);
+
+    maxPlotInput.value = maxPlot + delta;
+
+    updateMarkers();
+}
+
 function changeCapacity(delta) {
     let numberInput = document.getElementById('capacity-selector');
 
@@ -148,6 +157,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
     };
 
+    const maxPlotInput = document.getElementById('max-plot');
+    maxPlotInput.value = 100; // default value
+
     const ctx = document.getElementById('myChart').getContext('2d');
     const config =  {
         type: 'scatter',
@@ -155,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
         options: {
             animation: false,
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top',
@@ -166,11 +179,19 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             scales: {
                 x: {
+                    title: {
+                        display: true,
+                        text: 'Guests'
+                    },
                     min: 1,
                     max: 8
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Rent (EUR)'
+                    },
                 }
             }
         },

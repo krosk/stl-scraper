@@ -44,7 +44,3 @@ main {
     text-align: center; /* Add this line to center text horizontally */
 }
 
-#myChart {
-    height: 600px; 
-    width: 100%;
-}

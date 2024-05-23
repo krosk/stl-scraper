@@ -64,9 +64,16 @@
                 <div id="map"></div>
         
                 <div id="chart">
-                    <canvas class="col s12" id="myChart"></canvas>
-                    <label for="max-plot">Max rent plot:</label>
-                    <input type="number" id="max-plot" onchange="updateMarkers()">
+                    <div class="row">
+                        <div class="chart-container col s11" style="position: relative; height:40vh; width:100%">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                        <div class="rent-chart col s1">
+                            <input type="number" id="max-plot" style="display: none">
+                            <a class="btn tonal btn-large waves-effect waves-light " onclick="changeRentMaxPlot(50)">+</a>
+                            <a class="btn tonal btn-large waves-effect waves-light " onclick="changeRentMaxPlot(-50)">-</a>
+                        </div>    
+                    </div>
                     <p id="error-message"></p>
                 </div>
             </div>
