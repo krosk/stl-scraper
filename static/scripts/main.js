@@ -178,6 +178,8 @@ document.addEventListener("DOMContentLoaded", function () {
     myChart = new Chart(ctx, config);
 
     initializePython();
+
+    updateMarkers();
 });
 
 function showMain() {
