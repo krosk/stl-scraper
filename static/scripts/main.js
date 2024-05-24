@@ -246,8 +246,11 @@ async function initializePython(){
 }
 
 async function fetchRent(){
+    // disable button
+    let fetchButton = document.getElementById('fetch-button');
+    fetchButton.classList.add('disabled');
+
     let data = localStorage.getItem('data') || "{}";
-    //pyodide.FS.writeFile("/data.json", data, { encoding: "utf8" });
 
     let dateInput = document.getElementById('date-selector');
     const checkinDate = new Date(dateInput.value);
@@ -267,10 +270,10 @@ async function fetchRent(){
     let query = `stl.main.main(['search', "*", "--currency=EUR", "--checkin=${formattedCheckinDate}", "--checkout=${formattedCheckoutDate}", "--interval=2", "--search_by_map=true", "--ne_lat=${neLat}", "--ne_lng=${neLng}", "--sw_lat=${swLat}", "--sw_lng=${swLng}", "--storage=json", "--projectpath=/", '-v'])`;
     console.log(query)
 
-    //pyodide.runPython(query);
     const file = await callPython(query, {data: data});
-    //let file = pyodide.FS.readFile("/data.json", { encoding: "utf8" });
     localStorage.setItem("data", file);
+
+    fetchButton.classList.remove('disabled');
 
     updateMarkers();
 }
