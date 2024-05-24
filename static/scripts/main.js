@@ -249,6 +249,8 @@ async function fetchRent(){
     // disable button
     let fetchButton = document.getElementById('fetch-button');
     fetchButton.classList.add('disabled');
+    let fetchSpinner = document.getElementById('busy-fetch-spinner');
+    fetchSpinner.style.display = "block";
 
     let data = localStorage.getItem('data') || "{}";
 
@@ -274,6 +276,7 @@ async function fetchRent(){
     localStorage.setItem("data", file);
 
     fetchButton.classList.remove('disabled');
+    fetchSpinner.style.display = "none";
 
     updateMarkers();
 }

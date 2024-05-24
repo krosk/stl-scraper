@@ -57,7 +57,19 @@
                     </div>
                     <a class="btn tonal btn-large waves-effect waves-light col s1" onclick="changeCapacity(1)">+</a>
     
-                    <a class="btn btn-large waves-effect waves-light col s6 m6 l2" id="fetch-button" onclick="fetchRent()">Fetch rent</a>
+                    <a class="btn btn-large waves-effect waves-light col s6 m6 l2" id="fetch-button" onclick="fetchRent()">Fetch rent
+                        <div id="busy-fetch-spinner" class="preloader-wrapper small active" style="display: none">
+                            <div class="spinner-layer spinner-blue-only">
+                                <div class="circle-clipper left">
+                                    <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                    <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                    <div class="circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                     <a class="btn tonal btn-large waves-effect waves-light col s6 m6 l2" id="reset-button" onclick="resetData()">Reset rent</a>
                 </div>
 
